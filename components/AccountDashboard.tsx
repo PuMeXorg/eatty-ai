@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   AppWindow,
@@ -175,8 +175,15 @@ function LoginModal({ onClose }: { onClose: () => void }) {
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState(["", "", "", ""]);
+  const codeRefs = useRef<Array<HTMLInputElement | null>>([]);
   const emailReady = /\S+@\S+\.\S+/.test(email);
   const codeReady = code.every(Boolean);
+
+  useEffect(() => {
+    if (step === "code") {
+      window.setTimeout(() => codeRefs.current[0]?.focus(), 80);
+    }
+  }, [step]);
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-[#17130f]/55 px-4 py-8 backdrop-blur-md">
@@ -230,12 +237,37 @@ function LoginModal({ onClose }: { onClose: () => void }) {
               {code.map((value, index) => (
                 <input
                   key={index}
+                  ref={(node) => {
+                    codeRefs.current[index] = node;
+                  }}
                   className="h-14 rounded-[11px] border border-[#ececec] bg-white text-center text-xl font-extrabold shadow-[0_8px_24px_-18px_rgba(23,19,15,.55)] outline-none focus:border-[var(--green)]"
                   value={value}
                   onChange={(event) => {
+                    const digit = event.target.value.replace(/\D/g, "").slice(-1);
                     const next = [...code];
-                    next[index] = event.target.value.replace(/\D/g, "").slice(-1);
+                    next[index] = digit;
                     setCode(next);
+                    if (digit && index < code.length - 1) {
+                      codeRefs.current[index + 1]?.focus();
+                    }
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Backspace" && !code[index] && index > 0) {
+                      codeRefs.current[index - 1]?.focus();
+                    }
+                  }}
+                  onPaste={(event) => {
+                    event.preventDefault();
+                    const pasted = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, code.length).split("");
+                    if (!pasted.length) return;
+                    const next = [...code];
+                    pasted.forEach((digit, pastedIndex) => {
+                      if (index + pastedIndex < next.length) {
+                        next[index + pastedIndex] = digit;
+                      }
+                    });
+                    setCode(next);
+                    codeRefs.current[Math.min(index + pasted.length, code.length - 1)]?.focus();
                   }}
                   inputMode="numeric"
                   maxLength={1}
