@@ -12,12 +12,24 @@ import {
   LifeBuoy,
   ShieldCheck,
   Sparkles,
+  X,
 } from "lucide-react";
 import Brand from "./Brand";
 import { supportEmail } from "@/lib/site";
 
 type AccountStatus = "Active" | "Trial" | "Expired" | "Canceled";
 type SectionId = "overview" | "billing" | "payment" | "access" | "support";
+type ActionModalData =
+  | {
+      type: "cancel";
+      title: string;
+      body: string;
+    }
+  | {
+      type: "payment";
+      title: string;
+      body: string;
+    };
 
 const account = {
   status: "Trial" as AccountStatus,
@@ -88,6 +100,74 @@ function SupportCard() {
         </div>
       </div>
     </section>
+  );
+}
+
+function ActionModal({
+  data,
+  onClose,
+  onDone,
+}: {
+  data: ActionModalData;
+  onClose: () => void;
+  onDone: (message: string) => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-[#17130f]/50 px-4 py-8 backdrop-blur-md">
+      <div className="w-full max-w-[520px] rounded-[30px] border border-white/60 bg-[var(--paper)] p-6 shadow-[0_34px_100px_-40px_rgba(23,19,15,.8)]">
+        <div className="flex items-start justify-between gap-5">
+          <div>
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#e4f0e7] text-[var(--green-deep)]">
+              {data.type === "cancel" ? <CalendarDays size={23} /> : <CreditCard size={23} />}
+            </span>
+            <h2 className="mt-5 text-2xl font-extrabold tracking-tight">{data.title}</h2>
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{data.body}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[var(--line)] bg-white text-[var(--muted)] hover:text-[var(--ink)]"
+            aria-label="Close"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {data.type === "cancel" ? (
+          <div className="mt-7 grid gap-3 sm:grid-cols-2">
+            <button type="button" onClick={onClose} className="btn btn-secondary">
+              Keep subscription
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onDone("Cancellation request preview completed.");
+                onClose();
+              }}
+              className="btn btn-primary"
+            >
+              Confirm cancellation
+            </button>
+          </div>
+        ) : (
+          <div className="mt-7 grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => {
+                onDone("Stripe payment method update preview opened.");
+                onClose();
+              }}
+              className="btn btn-secondary"
+            >
+              Mark as opened
+            </button>
+            <Link href="/checkout?plan=yearly" className="btn btn-primary">
+              Open billing preview
+            </Link>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -235,7 +315,7 @@ function Overview() {
   );
 }
 
-function Billing() {
+function Billing({ onAction }: { onAction: (data: ActionModalData) => void }) {
   const copy = statusCopy(account.status);
 
   return (
@@ -253,14 +333,26 @@ function Billing() {
         <div className="mt-5 rounded-[24px] border border-[var(--line)] bg-white p-5">
           <h3 className="text-sm font-extrabold uppercase tracking-[.14em] text-[var(--muted)]">Cancellation Deadline</h3>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Cancel at least 1 day before the next billing date to avoid renewal.</p>
-          <button className="btn btn-secondary mt-5 w-fit">Cancel Subscription</button>
+          <button
+            type="button"
+            onClick={() =>
+              onAction({
+                type: "cancel",
+                title: "Cancel subscription?",
+                body: "This preview shows the cancellation step. In production this action should call Stripe Billing or your backend, then update the account status.",
+              })
+            }
+            className="btn btn-secondary mt-5 w-fit"
+          >
+            Cancel Subscription
+          </button>
         </div>
       </section>
     </div>
   );
 }
 
-function Payment() {
+function Payment({ onAction }: { onAction: (data: ActionModalData) => void }) {
   return (
     <div className="grid gap-5 lg:grid-cols-[1.1fr_.9fr]">
       <section className="rounded-[30px] border border-[var(--line)] bg-white p-6 shadow-[var(--shadow)]">
@@ -279,7 +371,19 @@ function Payment() {
               <p className="mt-3 text-sm leading-6 text-[var(--muted)]">This payment method is used for your Eatty subscription renewals.</p>
             </div>
           </div>
-          <button className="btn btn-primary mt-6 w-full md:w-fit">Update Payment Method</button>
+          <button
+            type="button"
+            onClick={() =>
+              onAction({
+                type: "payment",
+                title: "Update payment method",
+                body: "This button is ready for a Stripe Customer Portal or setup-intent flow. The preview opens a billing placeholder so the click has a clear result.",
+              })
+            }
+            className="btn btn-primary mt-6 w-full md:w-fit"
+          >
+            Update Payment Method
+          </button>
         </div>
       </section>
       <section className="rounded-[30px] border border-[var(--line)] bg-[#17130f] p-6 text-white shadow-[var(--shadow)]">
@@ -349,7 +453,14 @@ function Support() {
 export default function AccountDashboard() {
   const [active, setActive] = useState<SectionId>("overview");
   const [loginOpen, setLoginOpen] = useState(true);
+  const [actionModal, setActionModal] = useState<ActionModalData | null>(null);
+  const [toast, setToast] = useState("");
   const ActiveIcon = useMemo(() => sections.find((item) => item.id === active)?.icon || Sparkles, [active]);
+
+  function showToast(message: string) {
+    setToast(message);
+    window.setTimeout(() => setToast(""), 3200);
+  }
 
   return (
     <main className="min-h-screen bg-[var(--cream)]">
@@ -407,8 +518,8 @@ export default function AccountDashboard() {
 
         <section className="min-w-0 space-y-5">
           {active === "overview" ? <Overview /> : null}
-          {active === "billing" ? <Billing /> : null}
-          {active === "payment" ? <Payment /> : null}
+          {active === "billing" ? <Billing onAction={setActionModal} /> : null}
+          {active === "payment" ? <Payment onAction={setActionModal} /> : null}
           {active === "access" ? <Access /> : null}
           {active === "support" ? <Support /> : null}
           <SupportCard />
@@ -416,6 +527,12 @@ export default function AccountDashboard() {
       </div>
 
       {loginOpen ? <LoginModal onClose={() => setLoginOpen(false)} /> : null}
+      {actionModal ? <ActionModal data={actionModal} onClose={() => setActionModal(null)} onDone={showToast} /> : null}
+      {toast ? (
+        <div className="fixed bottom-5 left-1/2 z-50 w-[calc(100%-32px)] max-w-[420px] -translate-x-1/2 rounded-2xl border border-[var(--line)] bg-[#17130f] px-5 py-4 text-sm font-extrabold text-white shadow-[0_24px_80px_-36px_rgba(23,19,15,.8)]">
+          {toast}
+        </div>
+      ) : null}
     </main>
   );
 }
