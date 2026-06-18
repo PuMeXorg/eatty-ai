@@ -46,7 +46,7 @@ export default function LegalLayout({
         <div className="container-page flex h-16 items-center justify-between">
           <Brand compact />
           <Link href="/" className="text-sm font-bold text-[var(--muted)] hover:text-[var(--ink)]">
-            Back to home
+            Back home
           </Link>
         </div>
       </header>
@@ -65,9 +65,9 @@ export default function LegalLayout({
           Eatty AI provides nutrition and meal-planning tools for informational purposes only and is not medical advice.
         </p>
       </main>
-      <nav className="container-page flex max-w-[840px] flex-wrap gap-x-6 gap-y-3 border-t border-[var(--line)] py-7 text-sm font-semibold text-[var(--muted)]">
+      <nav className="container-page flex max-w-[840px] flex-wrap justify-center gap-x-6 gap-y-3 border-t border-[var(--line)] py-7 text-center text-sm font-semibold text-[var(--muted)]">
         {legalLinks.map((link) => (
-          <Link key={link.href} href={link.href} className="hover:text-[var(--ink)]">
+          <Link key={link.href} href={link.href} className="underline underline-offset-4 hover:text-[var(--ink)]">
             {link.label}
           </Link>
         ))}
