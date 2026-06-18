@@ -4,21 +4,14 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   AppWindow,
-  ArrowRight,
   CalendarDays,
   CheckCircle2,
   ChevronRight,
   CreditCard,
   Download,
-  KeyRound,
   LifeBuoy,
-  LockKeyhole,
-  LogIn,
-  Mail,
-  RefreshCw,
   ShieldCheck,
   Sparkles,
-  X,
 } from "lucide-react";
 import Brand from "./Brand";
 import { supportEmail } from "@/lib/site";
@@ -101,83 +94,87 @@ function SupportCard() {
 function LoginModal({ onClose }: { onClose: () => void }) {
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState(["", "", "", ""]);
+  const emailReady = /\S+@\S+\.\S+/.test(email);
+  const codeReady = code.every(Boolean);
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-[#17130f]/50 px-4 py-8 backdrop-blur-md">
-      <div className="w-full max-w-[500px] rounded-[32px] border border-white/55 bg-[var(--paper)] p-5 shadow-[0_34px_100px_-40px_rgba(23,19,15,.75)] md:p-7">
-        <div className="flex items-start justify-between gap-5">
-          <div>
-            <div className="mb-4 inline-grid h-12 w-12 place-items-center rounded-2xl bg-[#e4f0e7] text-[var(--green-deep)]">
-              {step === "email" ? <Mail size={24} /> : <KeyRound size={24} />}
-            </div>
-            <h2 className="text-2xl font-extrabold tracking-tight">{step === "email" ? "Log in to your account" : "Enter your login code"}</h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-              {step === "email"
-                ? "Enter the email you used for your Eatty subscription. We will send a one-time code to continue."
-                : "Use the one-time code sent to your email. In production this email can be sent through SendGrid."}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[var(--line)] bg-white text-[var(--muted)] hover:text-[var(--ink)]"
-            aria-label="Close login"
-          >
-            <X size={18} />
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-[#17130f]/55 px-4 py-8 backdrop-blur-md">
+      <div className="relative min-h-[560px] w-full max-w-[390px] rounded-[34px] border border-white/60 bg-[#fbfbfb] px-5 pb-7 pt-5 shadow-[0_34px_100px_-40px_rgba(23,19,15,.8)] md:min-h-[620px]">
+        <button type="button" onClick={onClose} className="absolute right-5 top-5 text-xs font-semibold text-[#9b9b9b]">
+          Skip
+        </button>
 
         {step === "email" ? (
           <form
-            className="mt-7"
+            className="flex min-h-[510px] flex-col pt-20 md:min-h-[570px]"
             onSubmit={(event) => {
               event.preventDefault();
-              setStep("code");
+              if (emailReady) setStep("code");
             }}
           >
-            <label className="block text-sm font-extrabold">
-              Email address
+            <h2 className="text-center text-[22px] font-extrabold tracking-[-.02em]">Please enter your email</h2>
+            <label className="mt-6 block">
               <input
-                className="mt-2 h-13 w-full rounded-2xl border border-[var(--line)] bg-white px-4 outline-none focus:border-[var(--green)]"
+                className="h-12 w-full rounded-[10px] border border-[#ececec] bg-white px-3 text-sm shadow-[0_8px_24px_-18px_rgba(23,19,15,.55)] outline-none placeholder:text-[#c6c6c6] focus:border-[var(--green)]"
                 type="email"
                 value={email}
-                placeholder="you@example.com"
+                placeholder="example@gmail.com"
                 onChange={(event) => setEmail(event.target.value)}
                 required
               />
             </label>
-            <button type="submit" className="btn btn-primary mt-5 w-full">
-              Send login code
-              <ArrowRight size={18} />
+            <button
+              type="submit"
+              disabled={!emailReady}
+              className={`mt-auto h-14 w-full rounded-[14px] text-sm font-extrabold text-white transition ${
+                emailReady ? "bg-[#17130f]" : "cursor-not-allowed bg-[#aaa]"
+              }`}
+            >
+              Continue
             </button>
           </form>
         ) : (
           <form
-            className="mt-7"
+            className="flex min-h-[510px] flex-col pt-20 md:min-h-[570px]"
             onSubmit={(event) => {
               event.preventDefault();
-              onClose();
+              if (codeReady) onClose();
             }}
           >
-            <label className="block text-sm font-extrabold">
-              One-time code
-              <input
-                className="mt-2 h-14 w-full rounded-2xl border border-[var(--line)] bg-white px-4 text-center text-2xl font-extrabold tracking-[.4em] outline-none focus:border-[var(--green)]"
-                placeholder="000000"
-                inputMode="numeric"
-                maxLength={6}
-                required
-              />
-            </label>
-            <p className="mt-3 text-xs leading-5 text-[var(--faint)]">
-              Code destination: {email || account.email}. Codes should be single-use and expire automatically.
+            <h2 className="text-center text-[22px] font-extrabold tracking-[-.02em]">Enter the code</h2>
+            <p className="mx-auto mt-4 max-w-[285px] text-center text-[11px] font-medium leading-4 text-[#4f4f4f]">
+              We sent a login code to {email || "example@gmail.com"}. Check your inbox including Spam folder.
             </p>
-            <button type="submit" className="btn btn-primary mt-5 w-full">
-              Log in
-              <LogIn size={18} />
+            <div className="mt-8 grid grid-cols-4 gap-3 px-8">
+              {code.map((value, index) => (
+                <input
+                  key={index}
+                  className="h-14 rounded-[11px] border border-[#ececec] bg-white text-center text-xl font-extrabold shadow-[0_8px_24px_-18px_rgba(23,19,15,.55)] outline-none focus:border-[var(--green)]"
+                  value={value}
+                  onChange={(event) => {
+                    const next = [...code];
+                    next[index] = event.target.value.replace(/\D/g, "").slice(-1);
+                    setCode(next);
+                  }}
+                  inputMode="numeric"
+                  maxLength={1}
+                  aria-label={`Code digit ${index + 1}`}
+                />
+              ))}
+            </div>
+            <p className="mt-5 text-center text-[11px] leading-4 text-[#8a8a8a]">Login codes can be delivered through SendGrid.</p>
+            <button
+              type="submit"
+              disabled={!codeReady}
+              className={`mt-auto h-14 w-full rounded-[14px] text-sm font-extrabold text-white transition ${
+                codeReady ? "bg-[#17130f]" : "cursor-not-allowed bg-[#aaa]"
+              }`}
+            >
+              Continue
             </button>
-            <button type="button" onClick={() => setStep("email")} className="mt-3 w-full text-sm font-extrabold text-[var(--green-deep)]">
-              Use a different email
+            <button type="button" onClick={() => setStep("email")} className="mt-4 w-full text-xs font-extrabold text-[#8a8a8a]">
+              Change email
             </button>
           </form>
         )}
