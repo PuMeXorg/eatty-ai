@@ -7,6 +7,7 @@ const nav = [
   { href: "#reviews", label: "Reviews" },
   { href: "#pricing", label: "Pricing" },
   { href: "#faq", label: "FAQ" },
+  { href: "/account", label: "Account" },
 ];
 
 export default function Header() {
@@ -21,7 +22,10 @@ export default function Header() {
             </a>
           ))}
         </nav>
-        <Link href="#pricing" className="btn btn-primary desktop-cta min-h-[44px] px-5 text-sm">
+        <Link href="/account" className="btn btn-primary desktop-cta min-h-[44px] px-5 text-sm">
+          Account
+        </Link>
+        <Link href="#pricing" className="btn btn-secondary desktop-cta min-h-[44px] px-5 text-sm">
           View Pricing
         </Link>
       </div>
