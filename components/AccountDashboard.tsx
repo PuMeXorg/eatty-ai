@@ -275,7 +275,6 @@ function LoginModal({ onClose }: { onClose: () => void }) {
                 />
               ))}
             </div>
-            <p className="mt-5 text-center text-[11px] leading-4 text-[#8a8a8a]">Login codes can be delivered through SendGrid.</p>
             <button
               type="submit"
               disabled={!codeReady}
@@ -542,10 +541,6 @@ export default function AccountDashboard() {
               );
             })}
           </nav>
-          <div className="mt-4 rounded-[22px] bg-[#e4f0e7] p-4">
-            <p className="text-xs font-extrabold uppercase tracking-[.14em] text-[var(--green-deep)]">SendGrid ready</p>
-            <p className="mt-2 text-sm leading-5 text-[var(--muted)]">Login codes can be sent through SendGrid once backend endpoints are connected.</p>
-          </div>
         </aside>
 
         <section className="min-w-0 space-y-5">
