@@ -21,13 +21,10 @@ export default function Header() {
             </a>
           ))}
         </nav>
-        <Link href="/account" className="btn btn-primary desktop-cta min-h-[44px] px-5 text-sm">
-          Log in
+        <Link href="/account" className="btn btn-secondary desktop-cta min-h-[44px] px-5 text-sm">
+          Sign in
         </Link>
-        <Link href="#pricing" className="btn btn-secondary desktop-cta min-h-[44px] px-5 text-sm">
-          Sign up
-        </Link>
-        <Link href="https://apps.apple.com/us/app/eatty-healthy-cooking-recipes/id6756583556" className="btn btn-secondary desktop-cta min-h-[44px] px-5 text-sm">
+        <Link href="https://apps.apple.com/us/app/eatty-healthy-cooking-recipes/id6756583556" className="btn btn-primary desktop-cta min-h-[44px] px-5 text-sm">
           Download App
         </Link>
       </div>

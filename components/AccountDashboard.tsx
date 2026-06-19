@@ -6,10 +6,12 @@ import {
   AppWindow,
   CalendarDays,
   CheckCircle2,
-  ChevronRight,
   CreditCard,
   Download,
   LifeBuoy,
+  LogOut,
+  Mail,
+  Send,
   ShieldCheck,
   Sparkles,
   X,
@@ -86,15 +88,14 @@ function statusCopy(status: AccountStatus) {
 
 function SupportCard() {
   return (
-    <section className="rounded-[24px] border border-[var(--line)] bg-[#17130f] p-5 text-white shadow-[0_24px_60px_-42px_rgba(23,19,15,.8)]">
-      <div className="flex items-start gap-4">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white/10 text-[#ebe85a]">
-          <LifeBuoy size={22} />
+    <section className="rounded-[18px] border border-[var(--line)] bg-white/72 p-4">
+      <div className="flex items-center gap-3">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#e4f0e7] text-[var(--green-deep)]">
+          <LifeBuoy size={18} />
         </span>
-        <div>
-          <h3 className="text-lg font-extrabold">Have a question or need help?</h3>
-          <p className="mt-2 text-sm leading-6 text-white/68">You can contact us anytime at:</p>
-          <a className="mt-2 inline-flex font-extrabold text-white underline underline-offset-4" href={`mailto:${supportEmail}`}>
+        <div className="min-w-0">
+          <h3 className="text-sm font-extrabold">Need help?</h3>
+          <a className="mt-1 inline-flex text-sm font-semibold text-[var(--green-deep)] underline underline-offset-4" href={`mailto:${supportEmail}`}>
             {supportEmail}
           </a>
         </div>
@@ -141,7 +142,7 @@ function ActionModal({
             <button
               type="button"
               onClick={() => {
-                onDone("Cancellation request preview completed.");
+                onDone("Subscription cancellation request received.");
                 onClose();
               }}
               className="btn btn-primary"
@@ -154,15 +155,15 @@ function ActionModal({
             <button
               type="button"
               onClick={() => {
-                onDone("Stripe payment method update preview opened.");
+                onDone("Payment method update started.");
                 onClose();
               }}
               className="btn btn-secondary"
             >
-              Mark as opened
+              Continue here
             </button>
             <Link href="/checkout?plan=yearly" className="btn btn-primary">
-              Open billing preview
+              Open billing
             </Link>
           </div>
         )}
@@ -186,24 +187,26 @@ function LoginModal({ onClose }: { onClose: () => void }) {
   }, [step]);
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-[#17130f]/55 px-4 py-8 backdrop-blur-md">
-      <div className="relative min-h-[560px] w-full max-w-[390px] rounded-[34px] border border-white/60 bg-[#fbfbfb] px-5 pb-7 pt-5 shadow-[0_34px_100px_-40px_rgba(23,19,15,.8)] md:min-h-[620px]">
-        <button type="button" onClick={onClose} className="absolute right-5 top-5 text-xs font-semibold text-[#9b9b9b]">
-          Skip
-        </button>
-
+    <div className="fixed inset-0 z-50 grid place-items-center bg-[#17130f]/45 px-4 py-8 backdrop-blur-md">
+      <div className="relative w-full max-w-[420px] rounded-[30px] border border-white/70 bg-[var(--paper)] p-6 shadow-[0_34px_100px_-46px_rgba(23,19,15,.75)]">
         {step === "email" ? (
           <form
-            className="flex min-h-[510px] flex-col pt-20 md:min-h-[570px]"
+            className="flex min-h-[420px] flex-col"
             onSubmit={(event) => {
               event.preventDefault();
               if (emailReady) setStep("code");
             }}
           >
-            <h2 className="text-center text-[22px] font-extrabold tracking-[-.02em]">Please enter your email</h2>
-            <label className="mt-6 block">
+            <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#e4f0e7] text-[var(--green-deep)]">
+              <Mail size={22} />
+            </span>
+            <h2 className="mt-6 text-center text-[25px] font-extrabold tracking-[-.02em]">Access Your Account</h2>
+            <p className="mx-auto mt-3 max-w-[310px] text-center text-sm leading-6 text-[var(--muted)]">
+              Enter the email connected to your Eatty AI subscription.
+            </p>
+            <label className="mt-7 block">
               <input
-                className="h-12 w-full rounded-[10px] border border-[#ececec] bg-white px-3 text-sm shadow-[0_8px_24px_-18px_rgba(23,19,15,.55)] outline-none placeholder:text-[#c6c6c6] focus:border-[var(--green)]"
+                className="h-12 w-full rounded-2xl border border-[var(--line)] bg-white px-4 text-sm shadow-[0_10px_28px_-24px_rgba(23,19,15,.55)] outline-none placeholder:text-[#b8b0a6] focus:border-[var(--green)]"
                 type="email"
                 value={email}
                 placeholder="example@gmail.com"
@@ -214,7 +217,7 @@ function LoginModal({ onClose }: { onClose: () => void }) {
             <button
               type="submit"
               disabled={!emailReady}
-              className={`mt-auto h-14 w-full rounded-[14px] text-sm font-extrabold text-white transition ${
+              className={`mt-auto h-13 w-full rounded-2xl text-sm font-extrabold text-white transition ${
                 emailReady ? "bg-[#17130f]" : "cursor-not-allowed bg-[#aaa]"
               }`}
             >
@@ -223,14 +226,17 @@ function LoginModal({ onClose }: { onClose: () => void }) {
           </form>
         ) : (
           <form
-            className="flex min-h-[510px] flex-col pt-20 md:min-h-[570px]"
+            className="flex min-h-[420px] flex-col"
             onSubmit={(event) => {
               event.preventDefault();
               if (codeReady) onClose();
             }}
           >
-            <h2 className="text-center text-[22px] font-extrabold tracking-[-.02em]">Enter the code</h2>
-            <p className="mx-auto mt-4 max-w-[285px] text-center text-[11px] font-medium leading-4 text-[#4f4f4f]">
+            <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#e4f0e7] text-[var(--green-deep)]">
+              <Mail size={22} />
+            </span>
+            <h2 className="mt-6 text-center text-[25px] font-extrabold tracking-[-.02em]">Enter the code</h2>
+            <p className="mx-auto mt-3 max-w-[300px] text-center text-xs font-medium leading-5 text-[var(--muted)]">
               We sent a login code to {email || "example@gmail.com"}. Check your inbox including Spam folder.
             </p>
             <div className="mt-8 grid grid-cols-4 gap-3 px-8">
@@ -278,7 +284,7 @@ function LoginModal({ onClose }: { onClose: () => void }) {
             <button
               type="submit"
               disabled={!codeReady}
-              className={`mt-auto h-14 w-full rounded-[14px] text-sm font-extrabold text-white transition ${
+              className={`mt-auto h-13 w-full rounded-2xl text-sm font-extrabold text-white transition ${
                 codeReady ? "bg-[#17130f]" : "cursor-not-allowed bg-[#aaa]"
               }`}
             >
@@ -296,36 +302,36 @@ function LoginModal({ onClose }: { onClose: () => void }) {
 
 function Metric({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Sparkles }) {
   return (
-    <div className="rounded-[22px] border border-[var(--line)] bg-white p-5">
-      <div className="flex items-center gap-3 text-sm font-bold text-[var(--muted)]">
-        <Icon size={18} className="text-[var(--green)]" />
+    <div className="rounded-[18px] border border-[var(--line)] bg-white/80 p-4">
+      <div className="flex items-center gap-2 text-xs font-bold text-[var(--muted)]">
+        <Icon size={16} className="text-[var(--green)]" />
         {label}
       </div>
-      <p className="mt-3 text-2xl font-extrabold tracking-tight">{value}</p>
+      <p className="mt-2 text-xl font-extrabold tracking-tight">{value}</p>
     </div>
   );
 }
 
-function Overview() {
+function Overview({ onGoAccess }: { onGoAccess: () => void }) {
   const copy = statusCopy(account.status);
 
   return (
     <div className="space-y-5">
-      <section className="rounded-[30px] border border-[var(--line)] bg-white p-5 shadow-[var(--shadow)] md:p-7">
+      <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
         <span className="eyebrow">Account overview</span>
-        <h1 className="mt-5 max-w-2xl text-3xl font-extrabold tracking-tight md:text-5xl">Welcome to your Eatty account.</h1>
-        <p className="mt-3 max-w-2xl text-[var(--muted)]">Manage your subscription, payment method, app access, and support options in one place.</p>
-        <div className="mt-7 grid gap-4 md:grid-cols-3">
+        <h1 className="mt-4 max-w-2xl text-2xl font-extrabold tracking-tight md:text-4xl">Welcome back.</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">Manage your subscription, payment method, app access, and support options in one place.</p>
+        <div className="mt-6 grid gap-3 md:grid-cols-3">
           <Metric label="Account status" value={account.status} icon={CheckCircle2} />
           <Metric label="Current plan" value={account.plan} icon={Sparkles} />
           <Metric label="Next billing date" value={account.nextBillingDate} icon={CalendarDays} />
         </div>
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-[1.35fr_.65fr]">
-        <div className="rounded-[26px] border border-[var(--line)] bg-[var(--paper)] p-6">
+      <section className="grid gap-4 lg:grid-cols-[1.45fr_.55fr]">
+        <div className="rounded-[20px] border border-[var(--line)] bg-[var(--paper)] p-5">
           <span className={`inline-flex rounded-full px-3 py-1 text-xs font-extrabold ${statusStyles[account.status]}`}>{account.status}</span>
-          <h2 className="mt-4 text-2xl font-extrabold">{copy.title}</h2>
+          <h2 className="mt-3 text-xl font-extrabold">{copy.title}</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.body}</p>
           {copy.action ? (
             <Link href="/checkout?plan=yearly" className="btn btn-primary mt-5 w-fit">
@@ -333,13 +339,13 @@ function Overview() {
             </Link>
           ) : null}
         </div>
-        <div className="rounded-[26px] border border-[var(--line)] bg-[#e4f0e7] p-6">
-          <Download className="text-[var(--green-deep)]" size={28} />
-          <h2 className="mt-4 text-2xl font-extrabold">Download App</h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Install Eatty to use your plan on your iPhone.</p>
-          <a href="https://apps.apple.com/us/app/eatty-healthy-cooking-recipes/id6756583556" className="btn btn-primary mt-5 w-full">
-            Download App
-          </a>
+        <div className="rounded-[18px] border border-[var(--line)] bg-white/70 p-4">
+          <Download className="text-[var(--green-deep)]" size={22} />
+          <h2 className="mt-3 text-lg font-extrabold">Open App Access</h2>
+          <p className="mt-2 text-xs leading-5 text-[var(--muted)]">Go to App Access to download Eatty AI.</p>
+          <button type="button" onClick={onGoAccess} className="btn btn-secondary mt-4 min-h-[44px] w-full text-sm">
+            Go to App Access
+          </button>
         </div>
       </section>
     </div>
@@ -351,17 +357,17 @@ function Billing({ onAction }: { onAction: (data: ActionModalData) => void }) {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-[30px] border border-[var(--line)] bg-white p-6 shadow-[var(--shadow)]">
+      <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
         <span className="eyebrow">Subscription & Billing</span>
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <div className="mt-6 grid gap-3 md:grid-cols-2">
           <Metric label="Current plan" value={account.plan} icon={Sparkles} />
           <Metric label="Account status" value={account.status} icon={CheckCircle2} />
         </div>
-        <div className="mt-5 rounded-[24px] border border-[var(--line)] bg-[var(--cream)] p-5">
-          <h2 className="text-xl font-extrabold">{copy.title}</h2>
+        <div className="mt-4 rounded-[18px] border border-[var(--line)] bg-[var(--cream)]/70 p-4">
+          <h2 className="text-lg font-extrabold">{copy.title}</h2>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{copy.body}</p>
         </div>
-        <div className="mt-5 rounded-[24px] border border-[var(--line)] bg-white p-5">
+        <div className="mt-4 rounded-[18px] border border-[var(--line)] bg-white p-4">
           <h3 className="text-sm font-extrabold uppercase tracking-[.14em] text-[var(--muted)]">Cancellation Deadline</h3>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Cancel at least 1 day before the next billing date to avoid renewal.</p>
           <button
@@ -370,7 +376,7 @@ function Billing({ onAction }: { onAction: (data: ActionModalData) => void }) {
               onAction({
                 type: "cancel",
                 title: "Cancel subscription?",
-                body: "This preview shows the cancellation step. In production this action should call Stripe Billing or your backend, then update the account status.",
+                body: "Your premium access will remain available until the end of the current billing period. You can renew your plan anytime from this account page.",
               })
             }
             className="btn btn-secondary mt-5 w-fit"
@@ -385,10 +391,10 @@ function Billing({ onAction }: { onAction: (data: ActionModalData) => void }) {
 
 function Payment({ onAction }: { onAction: (data: ActionModalData) => void }) {
   return (
-    <div className="grid gap-5 lg:grid-cols-[1.1fr_.9fr]">
-      <section className="rounded-[30px] border border-[var(--line)] bg-white p-6 shadow-[var(--shadow)]">
+    <div className="space-y-4">
+      <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
         <span className="eyebrow">Payment Method</span>
-        <div className="mt-6 rounded-[26px] border border-[var(--line)] bg-[var(--paper)] p-5">
+        <div className="mt-6 rounded-[20px] border border-[var(--line)] bg-[var(--paper)] p-5">
           <div className="flex items-start gap-4">
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#e4f0e7] text-[var(--green-deep)]">
               <CreditCard size={24} />
@@ -408,22 +414,21 @@ function Payment({ onAction }: { onAction: (data: ActionModalData) => void }) {
               onAction({
                 type: "payment",
                 title: "Update payment method",
-                body: "This button is ready for a Stripe Customer Portal or setup-intent flow. The preview opens a billing placeholder so the click has a clear result.",
+                body: "Continue to update the card used for Eatty AI subscription renewals.",
               })
             }
-            className="btn btn-primary mt-6 w-full md:w-fit"
+            className="btn btn-secondary mt-6 w-full md:w-fit"
           >
             Update Payment Method
           </button>
         </div>
       </section>
-      <section className="rounded-[30px] border border-[var(--line)] bg-[#17130f] p-6 text-white shadow-[var(--shadow)]">
-        <ShieldCheck className="text-[#ebe85a]" size={30} />
-        <h2 className="mt-5 text-2xl font-extrabold">Payment Security</h2>
-        <p className="mt-3 text-sm leading-6 text-white/68">
+      <div className="flex gap-3 px-1 text-sm leading-6 text-[var(--muted)]">
+        <ShieldCheck className="mt-1 shrink-0 text-[var(--green-deep)]" size={18} />
+        <p>
           Your payment details are processed securely by Stripe. Our company does not store your full card number or CVC.
         </p>
-      </section>
+      </div>
     </div>
   );
 }
@@ -438,33 +443,30 @@ function Access() {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-[30px] border border-[var(--line)] bg-white p-6 shadow-[var(--shadow)]">
-        <span className="eyebrow">App Access</span>
-        <div className="mt-6 grid gap-5 lg:grid-cols-[.9fr_1.1fr]">
-          <div className="rounded-[26px] border border-[var(--line)] bg-[#e4f0e7] p-6">
+      <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
+        <div className="rounded-[24px] bg-[#e4f0e7] p-5 md:p-6">
             <AppWindow className="text-[var(--green-deep)]" size={30} />
-            <h2 className="mt-5 text-2xl font-extrabold">Download and sign in automatically</h2>
+            <h2 className="mt-5 text-2xl font-extrabold">Access Your Account</h2>
             <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
               Use the secure app link below. When possible, Eatty will open the app and sign you in automatically.
             </p>
             <a href="https://apps.apple.com/us/app/eatty-healthy-cooking-recipes/id6756583556" className="btn btn-primary mt-5 w-full">
-              Download App
+              Download Eatty AI
             </a>
             <p className="mt-4 text-xs leading-5 text-[var(--muted)]">
               Automatic sign-in may depend on your device, browser, and app installation status.
             </p>
-          </div>
-          <div className="rounded-[26px] border border-[var(--line)] bg-[var(--paper)] p-6">
-            <h2 className="text-2xl font-extrabold">Manual login</h2>
+        </div>
+        <div className="mt-6 border-t border-[var(--line)] pt-6">
+            <h2 className="text-xl font-extrabold">Manual login</h2>
             <div className="mt-5 space-y-3">
               {steps.map((step, index) => (
-                <div key={step} className="flex gap-3 rounded-2xl bg-white p-4">
+                <div key={step} className="flex gap-3 rounded-2xl border border-[var(--line)] bg-[var(--paper)] p-4">
                   <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--green)] text-sm font-extrabold text-white">{index + 1}</span>
                   <p className="text-sm font-semibold leading-6">{step}</p>
                 </div>
               ))}
             </div>
-          </div>
         </div>
       </section>
     </div>
@@ -472,11 +474,47 @@ function Access() {
 }
 
 function Support() {
+  const [sent, setSent] = useState(false);
+
   return (
-    <section className="rounded-[30px] border border-[var(--line)] bg-white p-6 shadow-[var(--shadow)]">
+    <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
       <span className="eyebrow">Support</span>
-      <h1 className="mt-5 text-3xl font-extrabold tracking-tight">We are here to help.</h1>
-      <p className="mt-3 max-w-xl text-[var(--muted)]">Subscription, payment, and login questions can be sent directly to the Eatty support team.</p>
+      <h1 className="mt-5 text-3xl font-extrabold tracking-tight">How can we help?</h1>
+      <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--muted)]">Send a message to the Eatty AI support team. We will reply to your subscription email.</p>
+      <form
+        className="mt-6 grid gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSent(true);
+        }}
+      >
+        <label className="block text-sm font-extrabold">
+          Email
+          <input
+            className="mt-2 h-12 w-full rounded-2xl border border-[var(--line)] bg-[var(--paper)] px-4 outline-none focus:border-[var(--green)]"
+            defaultValue={account.email}
+            type="email"
+          />
+        </label>
+        <label className="block text-sm font-extrabold">
+          Message
+          <textarea
+            className="mt-2 min-h-[130px] w-full resize-none rounded-2xl border border-[var(--line)] bg-[var(--paper)] px-4 py-3 outline-none focus:border-[var(--green)]"
+            placeholder="Tell us what you need help with..."
+          />
+        </label>
+        <button type="submit" className="btn btn-secondary w-fit">
+          <Send size={17} />
+          Send message
+        </button>
+        {sent ? <p className="text-sm font-semibold text-[var(--green-deep)]">Your message has been prepared for support.</p> : null}
+      </form>
+      <div className="mt-6 rounded-[18px] border border-[var(--line)] bg-[#e4f0e7]/55 p-4">
+        <p className="text-sm font-extrabold">Prefer email?</p>
+        <a className="mt-1 inline-flex text-sm font-semibold text-[var(--green-deep)] underline underline-offset-4" href={`mailto:${supportEmail}`}>
+          {supportEmail}
+        </a>
+      </div>
     </section>
   );
 }
@@ -499,12 +537,16 @@ export default function AccountDashboard() {
         <div className="container-page flex h-[76px] items-center justify-between gap-4">
           <Brand />
           <div className="flex items-center gap-3">
-            <button onClick={() => setLoginOpen(true)} className="hidden rounded-full border border-[var(--line)] bg-white px-4 py-2 text-sm font-extrabold text-[var(--muted)] md:inline-flex">
-              Preview login
+            <button
+              onClick={() => {
+                showToast("You have been signed out.");
+                setLoginOpen(true);
+              }}
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-white px-4 py-2 text-sm font-extrabold text-[var(--muted)] hover:text-[var(--ink)]"
+            >
+              <LogOut size={16} />
+              Sign out
             </button>
-            <Link href="/" className="rounded-full border border-[var(--line)] bg-white px-4 py-2 text-sm font-extrabold">
-              Back home
-            </Link>
           </div>
         </div>
       </header>
@@ -517,7 +559,7 @@ export default function AccountDashboard() {
             </span>
             <div>
               <p className="text-xs font-extrabold uppercase tracking-[.14em] text-[var(--faint)]">Dashboard</p>
-              <p className="font-extrabold">Eatty account</p>
+              <p className="break-all text-sm font-extrabold">{account.email}</p>
             </div>
           </div>
           <nav className="grid gap-1">
@@ -536,7 +578,6 @@ export default function AccountDashboard() {
                     <Icon size={18} />
                     {item.label}
                   </span>
-                  <ChevronRight size={17} className={selected ? "text-white/65" : "text-[var(--faint)]"} />
                 </button>
               );
             })}
@@ -544,7 +585,7 @@ export default function AccountDashboard() {
         </aside>
 
         <section className="min-w-0 space-y-5">
-          {active === "overview" ? <Overview /> : null}
+          {active === "overview" ? <Overview onGoAccess={() => setActive("access")} /> : null}
           {active === "billing" ? <Billing onAction={setActionModal} /> : null}
           {active === "payment" ? <Payment onAction={setActionModal} /> : null}
           {active === "access" ? <Access /> : null}
