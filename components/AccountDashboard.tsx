@@ -164,17 +164,83 @@ function statusCopy(account: Account) {
 
 function SupportCard() {
   return (
-    <section className="rounded-[18px] border border-[var(--line)] bg-white/72 p-4">
+    <section className="rounded-[18px] border border-[var(--line)] bg-white/72 p-5">
       <div className="flex items-center gap-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#e4f0e7] text-[var(--green-deep)]">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#e4f0e7] text-[var(--green-deep)]">
           <LifeBuoy size={18} />
         </span>
         <div className="min-w-0">
-          <h3 className="text-sm font-extrabold">Have a question or need help?</h3>
-          <p className="mt-1 text-xs leading-5 text-[var(--muted)]">You can contact us anytime at:</p>
-          <a className="mt-1 inline-flex text-sm font-semibold text-[var(--green-deep)] underline underline-offset-4" href={`mailto:${supportEmail}`}>
+          <h3 className="text-base font-extrabold">Have a question or need help?</h3>
+          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+            You can contact us anytime at{" "}
+            <a className="font-semibold text-[var(--green-deep)] underline underline-offset-4" href={`mailto:${supportEmail}`}>
+              {supportEmail}
+            </a>
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AccountLoginBackdrop() {
+  return (
+    <div className="min-h-screen overflow-hidden bg-[var(--cream)]">
+      <header className="border-b border-[rgba(230,220,205,.82)] bg-[rgba(251,246,238,.86)] backdrop-blur-xl">
+        <div className="container-page flex h-[76px] items-center justify-between">
+          <Brand />
+          <div className="hidden items-center gap-8 text-sm font-bold text-[var(--muted)] md:flex">
+            <span>Features</span>
+            <span>How it works</span>
+            <span>Reviews</span>
+            <span>Pricing</span>
+            <span>FAQ</span>
+          </div>
+        </div>
+      </header>
+      <section className="container-page grid min-h-[calc(100vh-76px)] items-center gap-10 py-16 lg:grid-cols-[1.05fr_.95fr]">
+        <div>
+          <span className="eyebrow">Healthy cooking, made simple</span>
+          <h1 className="mt-7 max-w-[620px] text-5xl font-extrabold leading-[.98] tracking-tight md:text-7xl">
+            Reach your goals <span className="text-[var(--green-deep)]">without</span> boring diets
+          </h1>
+          <p className="mt-6 max-w-[540px] text-lg leading-8 text-[var(--muted)]">
+            Personalized meal plans, healthy recipes, and effortless calorie tracking in one friendly app.
+          </p>
+        </div>
+        <div className="relative hidden min-h-[520px] place-items-center lg:grid">
+          <div className="absolute left-6 top-20 rounded-2xl border border-[var(--line)] bg-white px-5 py-4 shadow-[0_18px_55px_-35px_rgba(23,19,15,.45)]">
+            <p className="text-sm font-extrabold">612 kcal</p>
+            <p className="text-xs text-[var(--muted)]">logged today</p>
+          </div>
+          <div className="grid h-[520px] w-[260px] place-items-center rounded-[48px] border-[12px] border-[#111] bg-white shadow-[0_28px_90px_-40px_rgba(23,19,15,.55)]">
+            <img src="/assets/eatty-icon.png" alt="" className="h-40 w-40 rounded-[34px]" />
+          </div>
+          <div className="absolute bottom-20 right-4 rounded-2xl border border-[var(--line)] bg-white px-5 py-4 shadow-[0_18px_55px_-35px_rgba(23,19,15,.45)]">
+            <p className="text-sm font-extrabold">7 items</p>
+            <p className="text-xs text-[var(--muted)]">grocery list</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function DirectSupportCard() {
+  return (
+    <section className="rounded-[18px] border border-[#c9dfd0] bg-[#e4f0e7]/72 p-5">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/70 text-[var(--green-deep)]">
+          <LifeBuoy size={18} />
+        </span>
+        <div>
+          <h3 className="text-base font-extrabold">Or email us directly</h3>
+          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+            You can also contact us at{" "}
+            <a className="font-semibold text-[var(--green-deep)] underline underline-offset-4" href={`mailto:${supportEmail}`}>
             {supportEmail}
-          </a>
+            </a>
+          </p>
         </div>
       </div>
     </section>
@@ -249,7 +315,7 @@ function ActionModal({
   );
 }
 
-function LoginModal({ onLogin }: { onLogin: (email: string) => void }) {
+function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: (email: string) => void }) {
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState(["", "", "", "", "", ""]);
@@ -266,6 +332,14 @@ function LoginModal({ onLogin }: { onLogin: (email: string) => void }) {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-[#17130f]/45 px-4 py-8 backdrop-blur-md">
       <div className="relative w-full max-w-[420px] rounded-[30px] border border-white/70 bg-[var(--paper)] p-6 shadow-[0_34px_100px_-46px_rgba(23,19,15,.75)]">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-[var(--line)] bg-white text-[var(--muted)] hover:text-[var(--ink)]"
+          aria-label="Close login"
+        >
+          <X size={17} />
+        </button>
         {step === "email" ? (
           <form
             className="flex min-h-[420px] flex-col"
@@ -279,7 +353,7 @@ function LoginModal({ onLogin }: { onLogin: (email: string) => void }) {
             </span>
             <h2 className="mt-6 text-center text-[25px] font-extrabold tracking-[-.02em]">Access Your Account</h2>
             <p className="mx-auto mt-3 max-w-[310px] text-center text-sm leading-6 text-[var(--muted)]">
-              Enter the email connected to your Eatty AI subscription.
+              Enter the email connected to your Eatty AI account.
             </p>
             <label className="mt-7 block">
               <input
@@ -397,7 +471,7 @@ function Overview({ account, onGoAccess }: { account: Account; onGoAccess: () =>
     <div className="space-y-5">
       <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
         <span className="eyebrow">Account overview</span>
-        <h1 className="mt-4 max-w-2xl text-2xl font-extrabold tracking-tight md:text-4xl">Welcome back.</h1>
+        <h1 className="mt-4 max-w-2xl text-2xl font-extrabold tracking-tight md:text-4xl">Welcome to your account</h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">Manage your subscription, payment method, app access, and support options in one place.</p>
         <div className="mt-6 grid gap-3 md:grid-cols-3">
           <Metric label="Account status" value={account.status} icon={CheckCircle2} />
@@ -547,16 +621,20 @@ function Access() {
   return (
     <div className="space-y-5">
       <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
-        <div className="rounded-[22px] border border-[#c9dfd0] bg-[#e4f0e7]/78 p-5 md:p-6">
-            <AppWindow className="text-[var(--green-deep)]" size={30} />
-            <h2 className="mt-5 text-2xl font-extrabold">Access Your Account</h2>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-              Use the secure app link below. When possible, Eatty will open the app and sign you in automatically.
+        <div className="rounded-[22px] border border-[#c9dfd0] bg-[#e4f0e7]/78 p-5 text-center md:p-8">
+            <AppWindow className="mx-auto text-[var(--green-deep)]" size={30} />
+            <h2 className="mt-5 text-3xl font-extrabold tracking-tight">Access Your Account</h2>
+            <p className="mx-auto mt-3 max-w-[620px] text-sm leading-6 text-[var(--muted)]">
+              😎 We’re thrilled to have you! To get access to Eatty App, please follow these instructions:
             </p>
-            <a href="https://apps.apple.com/us/app/eatty-healthy-cooking-recipes/id6756583556" className="btn btn-primary mt-5 w-full sm:w-fit">
-              Download Eatty AI
+            <p className="mt-8 text-sm font-extrabold">Log it automatically</p>
+            <a href="https://apps.apple.com/us/app/eatty-healthy-cooking-recipes/id6756583556" className="btn btn-primary mx-auto mt-3 w-full sm:w-[280px]">
+              Download Eatty
             </a>
-            <p className="mt-4 text-xs leading-5 text-[var(--muted)]">
+            <p className="mx-auto mt-4 max-w-[620px] text-sm leading-6 text-[var(--muted)]">
+              Tap the button above to access Eatty App, and you will be logged in to your account automatically.
+            </p>
+            <p className="mx-auto mt-1 max-w-[620px] text-xs leading-5 text-[var(--muted)]">
               Automatic sign-in may depend on your device, browser, and app installation status.
             </p>
         </div>
@@ -593,7 +671,7 @@ function Support({ userEmail }: { userEmail: string }) {
     <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
       <span className="eyebrow">Support</span>
       <h1 className="mt-5 text-3xl font-extrabold tracking-tight">How can we help?</h1>
-      <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--muted)]">Send a message to the Eatty AI support team. We will reply to your subscription email.</p>
+      <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--muted)]">Send a message to the Eatty AI support team. We will reply to your account email.</p>
       <form
         className="mt-6 grid gap-4"
         onSubmit={(event) => {
@@ -623,11 +701,8 @@ function Support({ userEmail }: { userEmail: string }) {
         </button>
         {sent ? <p className="text-sm font-semibold text-[var(--green-deep)]">Your message has been prepared for support.</p> : null}
       </form>
-      <div className="mt-6 rounded-[18px] border border-[var(--line)] bg-[#e4f0e7]/55 p-4">
-        <p className="text-sm font-extrabold">Prefer email?</p>
-        <a className="mt-1 inline-flex text-sm font-semibold text-[var(--green-deep)] underline underline-offset-4" href={`mailto:${supportEmail}`}>
-          {supportEmail}
-        </a>
+      <div className="mt-6">
+        <DirectSupportCard />
       </div>
     </section>
   );
@@ -645,6 +720,23 @@ export default function AccountDashboard() {
   function showToast(message: string) {
     setToast(message);
     window.setTimeout(() => setToast(""), 3200);
+  }
+
+  if (loginOpen) {
+    return (
+      <>
+        <AccountLoginBackdrop />
+        <LoginModal
+          onClose={() => setLoginOpen(false)}
+          onLogin={(email) => {
+            const account = accountForEmail(email);
+            setSelectedAccount(account);
+            setUserEmail(account.email);
+            setLoginOpen(false);
+          }}
+        />
+      </>
+    );
   }
 
   return (
@@ -706,20 +798,10 @@ export default function AccountDashboard() {
           {active === "payment" ? <Payment account={selectedAccount} onAction={setActionModal} /> : null}
           {active === "access" ? <Access /> : null}
           {active === "support" ? <Support userEmail={userEmail} /> : null}
-          <SupportCard />
+          {active !== "support" ? <SupportCard /> : null}
         </section>
       </div>
 
-      {loginOpen ? (
-        <LoginModal
-          onLogin={(email) => {
-            const account = accountForEmail(email);
-            setSelectedAccount(account);
-            setUserEmail(account.email);
-            setLoginOpen(false);
-          }}
-        />
-      ) : null}
       {actionModal ? <ActionModal data={actionModal} onClose={() => setActionModal(null)} onDone={showToast} /> : null}
       {toast ? (
         <div className="fixed bottom-5 left-1/2 z-50 w-[calc(100%-32px)] max-w-[420px] -translate-x-1/2 rounded-2xl border border-[var(--line)] bg-[#17130f] px-5 py-4 text-sm font-extrabold text-white shadow-[0_24px_80px_-36px_rgba(23,19,15,.8)]">
