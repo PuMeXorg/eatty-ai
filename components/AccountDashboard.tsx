@@ -319,9 +319,11 @@ function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: (email
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [codeError, setCodeError] = useState("");
   const codeRefs = useRef<Array<HTMLInputElement | null>>([]);
   const emailReady = /\S+@\S+\.\S+/.test(email);
   const codeReady = code.every(Boolean);
+  const validTestCode = "123456";
 
   useEffect(() => {
     if (step === "code") {
@@ -380,7 +382,14 @@ function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: (email
             className="flex min-h-[420px] flex-col"
             onSubmit={(event) => {
               event.preventDefault();
-              if (codeReady) onLogin(email);
+              if (!codeReady) return;
+
+              if (code.join("") !== validTestCode) {
+                setCodeError("Invalid code. Please check the 6-digit code and try again.");
+                return;
+              }
+
+              onLogin(email);
             }}
           >
             <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#e4f0e7] text-[var(--green-deep)]">
@@ -404,6 +413,7 @@ function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: (email
                     const next = [...code];
                     next[index] = digit;
                     setCode(next);
+                    if (codeError) setCodeError("");
                     if (digit && index < code.length - 1) {
                       codeRefs.current[index + 1]?.focus();
                     }
@@ -424,6 +434,7 @@ function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: (email
                       }
                     });
                     setCode(next);
+                    if (codeError) setCodeError("");
                     codeRefs.current[Math.min(index + pasted.length, code.length - 1)]?.focus();
                   }}
                   inputMode="numeric"
@@ -432,6 +443,13 @@ function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: (email
                 />
               ))}
             </div>
+            {codeError ? (
+              <p className="mt-4 rounded-2xl border border-[#ead0c7] bg-[#f8ebe7] px-4 py-3 text-center text-xs font-extrabold leading-5 text-[#9b3f2e]">
+                {codeError}
+              </p>
+            ) : (
+              <p className="mt-4 text-center text-xs font-semibold leading-5 text-[var(--faint)]">Use test code 123456 to preview the account.</p>
+            )}
             <button
               type="submit"
               disabled={!codeReady}
@@ -779,6 +797,10 @@ export default function AccountDashboard() {
               <p className="break-all text-sm font-extrabold">{userEmail}</p>
             </div>
           </div>
+          <div className="mb-2 flex items-center justify-between px-3 text-[11px] font-extrabold uppercase tracking-[.16em] text-[var(--faint)] lg:hidden">
+            <span>Account sections</span>
+            <span className="normal-case tracking-normal text-[var(--green-deep)]">Tap to open</span>
+          </div>
           <nav className="grid gap-1">
             {sections.map((item) => {
               const Icon = item.icon;
@@ -787,8 +809,10 @@ export default function AccountDashboard() {
                 <button
                   key={item.id}
                   onClick={() => setActive(item.id)}
-                  className={`flex min-h-12 items-center justify-between rounded-2xl px-3 text-left text-sm font-extrabold transition ${
-                    selected ? "bg-[#17130f] text-white" : "text-[var(--muted)] hover:bg-white hover:text-[var(--ink)]"
+                  className={`flex min-h-12 items-center justify-between rounded-2xl border px-3 text-left text-sm font-extrabold transition ${
+                    selected
+                      ? "border-[#17130f] bg-[#17130f] text-white"
+                      : "border-[var(--line)] bg-white/55 text-[var(--muted)] hover:border-[#cfc4b5] hover:bg-white hover:text-[var(--ink)]"
                   }`}
                 >
                   <span className="flex items-center gap-3">
