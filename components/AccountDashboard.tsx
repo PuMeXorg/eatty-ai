@@ -173,7 +173,7 @@ function SupportCard() {
           <h3 className="text-base font-extrabold">Have a question or need help?</h3>
           <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
             You can contact us anytime at{" "}
-            <a className="font-semibold text-[var(--green-deep)] underline underline-offset-4" href={`mailto:${supportEmail}`}>
+            <a className="font-extrabold text-[var(--green-deep)] underline underline-offset-4" href={`mailto:${supportEmail}`}>
               {supportEmail}
             </a>
           </p>
@@ -234,10 +234,10 @@ function DirectSupportCard() {
           <LifeBuoy size={18} />
         </span>
         <div>
-          <h3 className="text-base font-extrabold">Or email us directly</h3>
+          <h3 className="text-base font-extrabold">Email us directly</h3>
           <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
             You can also contact us at{" "}
-            <a className="font-semibold text-[var(--green-deep)] underline underline-offset-4" href={`mailto:${supportEmail}`}>
+            <a className="font-extrabold text-[var(--green-deep)] underline underline-offset-4" href={`mailto:${supportEmail}`}>
             {supportEmail}
             </a>
           </p>
@@ -480,8 +480,8 @@ function Overview({ account, onGoAccess }: { account: Account; onGoAccess: () =>
         </div>
       </section>
 
-      <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)]">
-        <div className="flex gap-3 px-1">
+      <section className="px-1">
+        <div className="flex gap-3">
           <span className={`mt-1 inline-flex h-7 shrink-0 items-center rounded-full px-3 text-xs font-extrabold ${statusStyles[account.status]}`}>
             {account.status}
           </span>
@@ -668,43 +668,50 @@ function Support({ userEmail }: { userEmail: string }) {
   }, [userEmail]);
 
   return (
-    <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
-      <span className="eyebrow">Support</span>
-      <h1 className="mt-5 text-3xl font-extrabold tracking-tight">How can we help?</h1>
-      <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--muted)]">Send a message to the Eatty AI support team. We will reply to your account email.</p>
-      <form
-        className="mt-6 grid gap-4"
-        onSubmit={(event) => {
-          event.preventDefault();
-          setSent(true);
-        }}
-      >
-        <label className="block text-sm font-extrabold">
-          Email
-          <input
-            className="mt-2 h-12 w-full rounded-2xl border border-[var(--line)] bg-[var(--paper)] px-4 outline-none focus:border-[var(--green)]"
-            value={contactEmail}
-            onChange={(event) => setContactEmail(event.target.value)}
-            type="email"
-          />
-        </label>
-        <label className="block text-sm font-extrabold">
-          Message
-          <textarea
-            className="mt-2 min-h-[130px] w-full resize-none rounded-2xl border border-[var(--line)] bg-[var(--paper)] px-4 py-3 outline-none focus:border-[var(--green)]"
-            placeholder="Tell us what you need help with..."
-          />
-        </label>
-        <button type="submit" className="btn btn-secondary w-fit">
-          <Send size={17} />
-          Send message
-        </button>
-        {sent ? <p className="text-sm font-semibold text-[var(--green-deep)]">Your message has been prepared for support.</p> : null}
-      </form>
-      <div className="mt-6">
+    <div className="space-y-5">
+      <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
+        <span className="eyebrow">Support</span>
+        <h1 className="mt-5 text-3xl font-extrabold tracking-tight">How can we help?</h1>
+        <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--muted)]">Send a message to the Eatty AI support team. We will reply to your account email.</p>
+        <form
+          className="mt-6 grid gap-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            setSent(true);
+          }}
+        >
+          <label className="block text-sm font-extrabold">
+            Email
+            <input
+              className="mt-2 h-12 w-full rounded-2xl border border-[var(--line)] bg-[var(--paper)] px-4 font-extrabold underline underline-offset-4 outline-none focus:border-[var(--green)]"
+              value={contactEmail}
+              onChange={(event) => setContactEmail(event.target.value)}
+              type="email"
+            />
+          </label>
+          <label className="block text-sm font-extrabold">
+            Message
+            <textarea
+              className="mt-2 min-h-[130px] w-full resize-none rounded-2xl border border-[var(--line)] bg-[var(--paper)] px-4 py-3 outline-none focus:border-[var(--green)]"
+              placeholder="Tell us what you need help with..."
+            />
+          </label>
+          <button type="submit" className="btn btn-secondary w-fit">
+            <Send size={17} />
+            Send message
+          </button>
+          {sent ? <p className="text-sm font-semibold text-[var(--green-deep)]">Your message has been prepared for support.</p> : null}
+        </form>
+      </section>
+      <div className="flex items-center gap-4 text-xs font-extrabold uppercase tracking-[.16em] text-[var(--faint)]">
+        <span className="h-px flex-1 bg-[var(--line)]" />
+        or
+        <span className="h-px flex-1 bg-[var(--line)]" />
+      </div>
+      <div>
         <DirectSupportCard />
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -727,7 +734,9 @@ export default function AccountDashboard() {
       <>
         <AccountLoginBackdrop />
         <LoginModal
-          onClose={() => setLoginOpen(false)}
+          onClose={() => {
+            window.location.href = "/";
+          }}
           onLogin={(email) => {
             const account = accountForEmail(email);
             setSelectedAccount(account);
