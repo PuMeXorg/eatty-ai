@@ -21,9 +21,9 @@ import { supportEmail } from "@/lib/site";
 
 type AccountStatus = "Active" | "Trial" | "Expired" | "Canceled";
 type SectionId = "overview" | "billing" | "payment" | "access" | "support";
-type DemoAccountId = "trial" | "active" | "canceled" | "expired";
+type TestAccountId = "trial" | "active" | "canceled" | "expired";
 type Account = {
-  id: DemoAccountId;
+  id: TestAccountId;
   label: string;
   status: AccountStatus;
   plan: "Yearly" | "Quarterly" | "Monthly";
@@ -49,7 +49,7 @@ type ActionModalData =
       body: string;
     };
 
-const demoAccounts: Record<DemoAccountId, Account> = {
+const testAccounts: Record<TestAccountId, Account> = {
   trial: {
     id: "trial",
     label: "Trial",
@@ -107,7 +107,21 @@ const demoAccounts: Record<DemoAccountId, Account> = {
   },
 };
 
-const defaultAccount = demoAccounts.trial;
+const defaultAccount = testAccounts.trial;
+
+function accountForEmail(email: string): Account {
+  const normalizedEmail = email.trim().toLowerCase();
+  const account = Object.values(testAccounts).find((item) => item.email === normalizedEmail);
+
+  if (account) {
+    return account;
+  }
+
+  return {
+    ...testAccounts.active,
+    email: normalizedEmail || testAccounts.active.email,
+  };
+}
 
 const sections: Array<{ id: SectionId; label: string; icon: typeof Sparkles }> = [
   { id: "overview", label: "Account overview", icon: Sparkles },
@@ -488,28 +502,28 @@ function Payment({ account, onAction }: { account: Account; onAction: (data: Act
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#e4f0e7] text-[var(--green-deep)]">
               <CreditCard size={24} />
             </span>
-            <div>
+            <div className="min-w-0 flex-1">
               <h2 className="text-xl font-extrabold">Current Payment Method</h2>
               <p className="mt-3 font-extrabold">
                 {account.card.brand} ending in {account.card.last4}
               </p>
               <p className="mt-1 text-sm text-[var(--muted)]">Expires {account.card.expires}</p>
               <p className="mt-3 text-sm leading-6 text-[var(--muted)]">This payment method is used for your Eatty subscription renewals.</p>
+              <button
+                type="button"
+                onClick={() =>
+                  onAction({
+                    type: "payment",
+                    title: "Update payment method",
+                    body: "Continue to update the card used for Eatty AI subscription renewals.",
+                  })
+                }
+                className="btn btn-secondary mt-6 w-full md:w-fit"
+              >
+                Update Payment Method
+              </button>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() =>
-              onAction({
-                type: "payment",
-                title: "Update payment method",
-                body: "Continue to update the card used for Eatty AI subscription renewals.",
-              })
-            }
-            className="btn btn-secondary mt-6 w-full md:w-fit"
-          >
-            Update Payment Method
-          </button>
         </div>
       </section>
       <div className="flex gap-3 px-1 text-sm leading-6 text-[var(--muted)]">
@@ -622,16 +636,11 @@ function Support({ userEmail }: { userEmail: string }) {
 export default function AccountDashboard() {
   const [active, setActive] = useState<SectionId>("overview");
   const [loginOpen, setLoginOpen] = useState(true);
-  const [demoAccountId, setDemoAccountId] = useState<DemoAccountId>("trial");
-  const selectedAccount = demoAccounts[demoAccountId];
+  const [selectedAccount, setSelectedAccount] = useState<Account>(defaultAccount);
   const [userEmail, setUserEmail] = useState(defaultAccount.email);
   const [actionModal, setActionModal] = useState<ActionModalData | null>(null);
   const [toast, setToast] = useState("");
   const ActiveIcon = useMemo(() => sections.find((item) => item.id === active)?.icon || Sparkles, [active]);
-
-  useEffect(() => {
-    setUserEmail(selectedAccount.email);
-  }, [selectedAccount.email]);
 
   function showToast(message: string) {
     setToast(message);
@@ -689,28 +698,6 @@ export default function AccountDashboard() {
               );
             })}
           </nav>
-          <div className="mt-4 border-t border-[var(--line)] px-1 pt-4">
-            <p className="px-2 text-[11px] font-extrabold uppercase tracking-[.16em] text-[var(--faint)]">Demo status</p>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              {Object.values(demoAccounts).map((item) => {
-                const selected = demoAccountId === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setDemoAccountId(item.id)}
-                    className={`rounded-xl border px-3 py-2 text-left text-xs font-extrabold transition ${
-                      selected
-                        ? "border-[var(--green)] bg-[#e4f0e7] text-[var(--green-deep)]"
-                        : "border-[var(--line)] bg-white/70 text-[var(--muted)] hover:text-[var(--ink)]"
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         </aside>
 
         <section className="min-w-0 space-y-5">
@@ -726,7 +713,9 @@ export default function AccountDashboard() {
       {loginOpen ? (
         <LoginModal
           onLogin={(email) => {
-            setUserEmail(email);
+            const account = accountForEmail(email);
+            setSelectedAccount(account);
+            setUserEmail(account.email);
             setLoginOpen(false);
           }}
         />
