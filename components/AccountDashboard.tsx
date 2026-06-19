@@ -332,8 +332,8 @@ function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: (email
   }, [step]);
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-[#17130f]/45 px-4 py-8 backdrop-blur-md">
-      <div className="relative w-full max-w-[420px] rounded-[30px] border border-white/70 bg-[var(--paper)] p-6 shadow-[0_34px_100px_-46px_rgba(23,19,15,.75)]">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#17130f]/45 px-4 py-4 backdrop-blur-md sm:items-center sm:py-8">
+      <div className="relative w-full max-w-[420px] rounded-[30px] border border-white/70 bg-[var(--paper)] p-5 shadow-[0_34px_100px_-46px_rgba(23,19,15,.75)] sm:p-6">
         <button
           type="button"
           onClick={onClose}
@@ -344,7 +344,7 @@ function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: (email
         </button>
         {step === "email" ? (
           <form
-            className="flex min-h-[420px] flex-col"
+            className="flex min-h-[360px] flex-col sm:min-h-[420px]"
             onSubmit={(event) => {
               event.preventDefault();
               if (emailReady) setStep("code");
@@ -379,7 +379,7 @@ function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: (email
           </form>
         ) : (
           <form
-            className="flex min-h-[420px] flex-col"
+            className="flex min-h-[360px] flex-col sm:min-h-[420px]"
             onSubmit={(event) => {
               event.preventDefault();
               if (!codeReady) return;
@@ -395,18 +395,18 @@ function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: (email
             <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#e4f0e7] text-[var(--green-deep)]">
               <Mail size={22} />
             </span>
-            <h2 className="mt-6 text-center text-[25px] font-extrabold tracking-[-.02em]">Enter the code</h2>
+            <h2 className="mt-5 text-center text-[25px] font-extrabold tracking-[-.02em]">Enter the code</h2>
             <p className="mx-auto mt-3 max-w-[300px] text-center text-xs font-medium leading-5 text-[var(--muted)]">
               We sent a login code to {email || "example@gmail.com"}. Check your inbox including Spam folder.
             </p>
-            <div className="mt-8 grid grid-cols-6 gap-2 sm:gap-3">
+            <div className="mt-6 grid grid-cols-6 gap-2 sm:mt-8 sm:gap-3">
               {code.map((value, index) => (
                 <input
                   key={index}
                   ref={(node) => {
                     codeRefs.current[index] = node;
                   }}
-                  className="h-13 min-w-0 rounded-[11px] border border-[#ececec] bg-white text-center text-xl font-extrabold shadow-[0_8px_24px_-18px_rgba(23,19,15,.55)] outline-none focus:border-[var(--green)] sm:h-14"
+                  className="h-12 min-w-0 rounded-[11px] border border-[#ececec] bg-white text-center text-xl font-extrabold shadow-[0_8px_24px_-18px_rgba(23,19,15,.55)] outline-none focus:border-[var(--green)] sm:h-14"
                   value={value}
                   onChange={(event) => {
                     const digit = event.target.value.replace(/\D/g, "").slice(-1);
@@ -444,7 +444,7 @@ function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: (email
               ))}
             </div>
             {codeError ? (
-              <p className="mt-4 rounded-2xl border border-[#ead0c7] bg-[#f8ebe7] px-4 py-3 text-center text-xs font-extrabold leading-5 text-[#9b3f2e]">
+              <p className="mt-4 rounded-2xl border border-[#ead0c7] bg-[#f8ebe7] px-4 py-2.5 text-center text-xs font-extrabold leading-5 text-[#9b3f2e]">
                 {codeError}
               </p>
             ) : (
@@ -453,7 +453,7 @@ function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: (email
             <button
               type="submit"
               disabled={!codeReady}
-              className={`mt-auto h-13 w-full rounded-2xl text-sm font-extrabold text-white transition ${
+              className={`mt-5 h-13 w-full rounded-2xl text-sm font-extrabold text-white transition ${
                 codeReady ? "bg-[#17130f]" : "cursor-not-allowed bg-[#aaa]"
               }`}
             >
