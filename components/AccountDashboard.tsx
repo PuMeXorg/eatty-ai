@@ -363,13 +363,16 @@ function Billing({ onAction }: { onAction: (data: ActionModalData) => void }) {
           <Metric label="Current plan" value={account.plan} icon={Sparkles} />
           <Metric label="Account status" value={account.status} icon={CheckCircle2} />
         </div>
-        <div className="mt-4 rounded-[18px] border border-[var(--line)] bg-[var(--cream)]/70 p-4">
-          <h2 className="text-lg font-extrabold">{copy.title}</h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{copy.body}</p>
+        <div className="mt-5 flex gap-3 px-1">
+          <span className="mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#fff0dc] text-xs font-extrabold text-[#a8691d]">
+            {account.status.slice(0, 1)}
+          </span>
+          <div>
+            <h2 className="text-base font-extrabold">{copy.title}</h2>
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.body}</p>
+          </div>
         </div>
-        <div className="mt-4 rounded-[18px] border border-[var(--line)] bg-white p-4">
-          <h3 className="text-sm font-extrabold uppercase tracking-[.14em] text-[var(--muted)]">Cancellation Deadline</h3>
-          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Cancel at least 1 day before the next billing date to avoid renewal.</p>
+        <div className="mt-6 rounded-[18px] border border-[var(--line)] bg-[var(--paper)] p-4">
           <button
             type="button"
             onClick={() =>
@@ -379,10 +382,11 @@ function Billing({ onAction }: { onAction: (data: ActionModalData) => void }) {
                 body: "Your premium access will remain available until the end of the current billing period. You can renew your plan anytime from this account page.",
               })
             }
-            className="btn btn-secondary mt-5 w-fit"
+            className="btn btn-secondary w-fit"
           >
             Cancel Subscription
           </button>
+          <p className="mt-3 text-xs leading-5 text-[var(--muted)]">Cancel at least 1 day before the next billing date to avoid renewal.</p>
         </div>
       </section>
     </div>
@@ -444,21 +448,26 @@ function Access() {
   return (
     <div className="space-y-5">
       <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
-        <div className="rounded-[24px] bg-[#e4f0e7] p-5 md:p-6">
+        <div className="rounded-[22px] border border-[#c9dfd0] bg-[#e4f0e7]/78 p-5 md:p-6">
             <AppWindow className="text-[var(--green-deep)]" size={30} />
             <h2 className="mt-5 text-2xl font-extrabold">Access Your Account</h2>
             <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
               Use the secure app link below. When possible, Eatty will open the app and sign you in automatically.
             </p>
-            <a href="https://apps.apple.com/us/app/eatty-healthy-cooking-recipes/id6756583556" className="btn btn-primary mt-5 w-full">
+            <a href="https://apps.apple.com/us/app/eatty-healthy-cooking-recipes/id6756583556" className="btn btn-primary mt-5 w-full sm:w-fit">
               Download Eatty AI
             </a>
             <p className="mt-4 text-xs leading-5 text-[var(--muted)]">
               Automatic sign-in may depend on your device, browser, and app installation status.
             </p>
         </div>
-        <div className="mt-6 border-t border-[var(--line)] pt-6">
-            <h2 className="text-xl font-extrabold">Manual login</h2>
+        <div className="mt-6 flex items-center gap-4 text-xs font-extrabold uppercase tracking-[.16em] text-[var(--faint)]">
+          <span className="h-px flex-1 bg-[var(--line)]" />
+          or
+          <span className="h-px flex-1 bg-[var(--line)]" />
+        </div>
+        <div className="pt-6">
+            <h2 className="text-xl font-extrabold">Log it manually</h2>
             <div className="mt-5 space-y-3">
               {steps.map((step, index) => (
                 <div key={step} className="flex gap-3 rounded-2xl border border-[var(--line)] bg-[var(--paper)] p-4">
