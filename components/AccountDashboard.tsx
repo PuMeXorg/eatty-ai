@@ -21,6 +21,22 @@ import { supportEmail } from "@/lib/site";
 
 type AccountStatus = "Active" | "Trial" | "Expired" | "Canceled";
 type SectionId = "overview" | "billing" | "payment" | "access" | "support";
+type DemoAccountId = "trial" | "active" | "canceled" | "expired";
+type Account = {
+  id: DemoAccountId;
+  label: string;
+  status: AccountStatus;
+  plan: "Yearly" | "Quarterly" | "Monthly";
+  trialEnds?: string;
+  nextBillingDate?: string;
+  renewalPrice: string;
+  email: string;
+  card: {
+    brand: string;
+    last4: string;
+    expires: string;
+  };
+};
 type ActionModalData =
   | {
       type: "cancel";
@@ -33,19 +49,65 @@ type ActionModalData =
       body: string;
     };
 
-const account = {
-  status: "Trial" as AccountStatus,
-  plan: "Yearly",
-  trialEnds: "July 25, 2026",
-  nextBillingDate: "July 25, 2026",
-  renewalPrice: "$89.53/year",
-  email: "member@eattyai.com",
-  card: {
-    brand: "Visa",
-    last4: "4242",
-    expires: "08/28",
+const demoAccounts: Record<DemoAccountId, Account> = {
+  trial: {
+    id: "trial",
+    label: "Trial",
+    status: "Trial",
+    plan: "Yearly",
+    trialEnds: "July 25, 2026",
+    nextBillingDate: "July 25, 2026",
+    renewalPrice: "$89.53/year",
+    email: "trial@eattyai.com",
+    card: {
+      brand: "Visa",
+      last4: "4242",
+      expires: "08/28",
+    },
+  },
+  active: {
+    id: "active",
+    label: "Active",
+    status: "Active",
+    plan: "Quarterly",
+    nextBillingDate: "October 25, 2026",
+    renewalPrice: "$31.76/quarter",
+    email: "active@eattyai.com",
+    card: {
+      brand: "Visa",
+      last4: "4242",
+      expires: "08/28",
+    },
+  },
+  canceled: {
+    id: "canceled",
+    label: "Canceled",
+    status: "Canceled",
+    plan: "Monthly",
+    renewalPrice: "$11.99/month",
+    email: "canceled@eattyai.com",
+    card: {
+      brand: "Visa",
+      last4: "4242",
+      expires: "08/28",
+    },
+  },
+  expired: {
+    id: "expired",
+    label: "Expired",
+    status: "Expired",
+    plan: "Yearly",
+    renewalPrice: "$89.53/year",
+    email: "expired@eattyai.com",
+    card: {
+      brand: "Visa",
+      last4: "4242",
+      expires: "08/28",
+    },
   },
 };
+
+const defaultAccount = demoAccounts.trial;
 
 const sections: Array<{ id: SectionId; label: string; icon: typeof Sparkles }> = [
   { id: "overview", label: "Account overview", icon: Sparkles },
@@ -62,8 +124,8 @@ const statusStyles: Record<AccountStatus, string> = {
   Canceled: "bg-[#eee9e1] text-[var(--muted)]",
 };
 
-function statusCopy(status: AccountStatus) {
-  if (status === "Trial") {
+function statusCopy(account: Account) {
+  if (account.status === "Trial") {
     return {
       title: `Your 7-day trial period ends on ${account.trialEnds}.`,
       body: `After the trial, your ${account.plan} Plan renews at ${account.renewalPrice} unless canceled before the trial ends.`,
@@ -71,9 +133,9 @@ function statusCopy(status: AccountStatus) {
     };
   }
 
-  if (status === "Expired" || status === "Canceled") {
+  if (account.status === "Expired" || account.status === "Canceled") {
     return {
-      title: `Your subscription has ${status === "Expired" ? "expired" : "been canceled"}.`,
+      title: `Your subscription has ${account.status === "Expired" ? "expired" : "been canceled"}.`,
       body: "Renew your plan to continue using Eatty premium features.",
       action: "Renew your plan",
     };
@@ -313,8 +375,9 @@ function Metric({ label, value, icon: Icon }: { label: string; value: string; ic
   );
 }
 
-function Overview({ onGoAccess }: { onGoAccess: () => void }) {
-  const copy = statusCopy(account.status);
+function Overview({ account, onGoAccess }: { account: Account; onGoAccess: () => void }) {
+  const copy = statusCopy(account);
+  const nextBillingDate = account.nextBillingDate || "Not scheduled";
 
   return (
     <div className="space-y-5">
@@ -325,7 +388,7 @@ function Overview({ onGoAccess }: { onGoAccess: () => void }) {
         <div className="mt-6 grid gap-3 md:grid-cols-3">
           <Metric label="Account status" value={account.status} icon={CheckCircle2} />
           <Metric label="Current plan" value={account.plan} icon={Sparkles} />
-          <Metric label="Next billing date" value={account.nextBillingDate} icon={CalendarDays} />
+          <Metric label="Next billing date" value={nextBillingDate} icon={CalendarDays} />
         </div>
       </section>
 
@@ -364,8 +427,9 @@ function Overview({ onGoAccess }: { onGoAccess: () => void }) {
   );
 }
 
-function Billing({ onAction }: { onAction: (data: ActionModalData) => void }) {
-  const copy = statusCopy(account.status);
+function Billing({ account, onAction }: { account: Account; onAction: (data: ActionModalData) => void }) {
+  const copy = statusCopy(account);
+  const canCancel = account.status === "Active" || account.status === "Trial";
 
   return (
     <div className="space-y-5">
@@ -376,36 +440,45 @@ function Billing({ onAction }: { onAction: (data: ActionModalData) => void }) {
           <Metric label="Account status" value={account.status} icon={CheckCircle2} />
         </div>
         <div className="mt-5 flex gap-3 px-1">
-          <span className="mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#fff0dc] text-xs font-extrabold text-[#a8691d]">
-            {account.status.slice(0, 1)}
+          <span className={`mt-1 inline-flex h-7 shrink-0 items-center rounded-full px-3 text-xs font-extrabold ${statusStyles[account.status]}`}>
+            {account.status}
           </span>
           <div>
             <h2 className="text-base font-extrabold">{copy.title}</h2>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.body}</p>
           </div>
         </div>
-        <div className="mt-6 rounded-[18px] border border-[var(--line)] bg-[var(--paper)] p-4">
-          <button
-            type="button"
-            onClick={() =>
-              onAction({
-                type: "cancel",
-                title: "Cancel subscription?",
-                body: "Your premium access will remain available until the end of the current billing period. You can renew your plan anytime from this account page.",
-              })
-            }
-            className="btn btn-secondary w-fit"
-          >
-            Cancel Subscription
-          </button>
-          <p className="mt-3 text-xs leading-5 text-[var(--muted)]">Cancel at least 1 day before the next billing date to avoid renewal.</p>
-        </div>
+        {canCancel ? (
+          <div className="mt-6 rounded-[18px] border border-[var(--line)] bg-[var(--paper)] p-4">
+            <button
+              type="button"
+              onClick={() =>
+                onAction({
+                  type: "cancel",
+                  title: "Cancel subscription?",
+                  body: "Your premium access will remain available until the end of the current billing period. You can renew your plan anytime from this account page.",
+                })
+              }
+              className="btn btn-secondary w-fit"
+            >
+              Cancel Subscription
+            </button>
+            <p className="mt-3 text-xs leading-5 text-[var(--muted)]">Cancel at least 1 day before the next billing date to avoid renewal.</p>
+          </div>
+        ) : (
+          <div className="mt-6 rounded-[18px] border border-[var(--line)] bg-[var(--paper)] p-4">
+            <Link href="/checkout?plan=yearly" className="btn btn-secondary w-fit">
+              Renew your plan
+            </Link>
+            <p className="mt-3 text-xs leading-5 text-[var(--muted)]">Choose a new plan to restore Eatty AI premium access.</p>
+          </div>
+        )}
       </section>
     </div>
   );
 }
 
-function Payment({ onAction }: { onAction: (data: ActionModalData) => void }) {
+function Payment({ account, onAction }: { account: Account; onAction: (data: ActionModalData) => void }) {
   return (
     <div className="space-y-4">
       <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
@@ -549,10 +622,16 @@ function Support({ userEmail }: { userEmail: string }) {
 export default function AccountDashboard() {
   const [active, setActive] = useState<SectionId>("overview");
   const [loginOpen, setLoginOpen] = useState(true);
-  const [userEmail, setUserEmail] = useState(account.email);
+  const [demoAccountId, setDemoAccountId] = useState<DemoAccountId>("trial");
+  const selectedAccount = demoAccounts[demoAccountId];
+  const [userEmail, setUserEmail] = useState(defaultAccount.email);
   const [actionModal, setActionModal] = useState<ActionModalData | null>(null);
   const [toast, setToast] = useState("");
   const ActiveIcon = useMemo(() => sections.find((item) => item.id === active)?.icon || Sparkles, [active]);
+
+  useEffect(() => {
+    setUserEmail(selectedAccount.email);
+  }, [selectedAccount.email]);
 
   function showToast(message: string) {
     setToast(message);
@@ -610,12 +689,34 @@ export default function AccountDashboard() {
               );
             })}
           </nav>
+          <div className="mt-4 border-t border-[var(--line)] px-1 pt-4">
+            <p className="px-2 text-[11px] font-extrabold uppercase tracking-[.16em] text-[var(--faint)]">Demo status</p>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {Object.values(demoAccounts).map((item) => {
+                const selected = demoAccountId === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setDemoAccountId(item.id)}
+                    className={`rounded-xl border px-3 py-2 text-left text-xs font-extrabold transition ${
+                      selected
+                        ? "border-[var(--green)] bg-[#e4f0e7] text-[var(--green-deep)]"
+                        : "border-[var(--line)] bg-white/70 text-[var(--muted)] hover:text-[var(--ink)]"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </aside>
 
         <section className="min-w-0 space-y-5">
-          {active === "overview" ? <Overview onGoAccess={() => setActive("access")} /> : null}
-          {active === "billing" ? <Billing onAction={setActionModal} /> : null}
-          {active === "payment" ? <Payment onAction={setActionModal} /> : null}
+          {active === "overview" ? <Overview account={selectedAccount} onGoAccess={() => setActive("access")} /> : null}
+          {active === "billing" ? <Billing account={selectedAccount} onAction={setActionModal} /> : null}
+          {active === "payment" ? <Payment account={selectedAccount} onAction={setActionModal} /> : null}
           {active === "access" ? <Access /> : null}
           {active === "support" ? <Support userEmail={userEmail} /> : null}
           <SupportCard />
