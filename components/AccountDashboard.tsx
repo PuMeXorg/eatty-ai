@@ -94,7 +94,8 @@ function SupportCard() {
           <LifeBuoy size={18} />
         </span>
         <div className="min-w-0">
-          <h3 className="text-sm font-extrabold">Need help?</h3>
+          <h3 className="text-sm font-extrabold">Have a question or need help?</h3>
+          <p className="mt-1 text-xs leading-5 text-[var(--muted)]">You can contact us anytime at:</p>
           <a className="mt-1 inline-flex text-sm font-semibold text-[var(--green-deep)] underline underline-offset-4" href={`mailto:${supportEmail}`}>
             {supportEmail}
           </a>
@@ -172,7 +173,7 @@ function ActionModal({
   );
 }
 
-function LoginModal({ onClose }: { onClose: () => void }) {
+function LoginModal({ onLogin }: { onLogin: (email: string) => void }) {
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState(["", "", "", "", "", ""]);
@@ -229,7 +230,7 @@ function LoginModal({ onClose }: { onClose: () => void }) {
             className="flex min-h-[420px] flex-col"
             onSubmit={(event) => {
               event.preventDefault();
-              if (codeReady) onClose();
+              if (codeReady) onLogin(email);
             }}
           >
             <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#e4f0e7] text-[var(--green-deep)]">
@@ -328,25 +329,36 @@ function Overview({ onGoAccess }: { onGoAccess: () => void }) {
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[1.45fr_.55fr]">
-        <div className="rounded-[20px] border border-[var(--line)] bg-[var(--paper)] p-5">
-          <span className={`inline-flex rounded-full px-3 py-1 text-xs font-extrabold ${statusStyles[account.status]}`}>{account.status}</span>
-          <h2 className="mt-3 text-xl font-extrabold">{copy.title}</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.body}</p>
-          {copy.action ? (
-            <Link href="/checkout?plan=yearly" className="btn btn-primary mt-5 w-fit">
-              {copy.action}
-            </Link>
-          ) : null}
+      <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)]">
+        <div className="flex gap-3 px-1">
+          <span className={`mt-1 inline-flex h-7 shrink-0 items-center rounded-full px-3 text-xs font-extrabold ${statusStyles[account.status]}`}>
+            {account.status}
+          </span>
+          <div>
+            <h2 className="text-xl font-extrabold">{copy.title}</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">{copy.body}</p>
+            {copy.action ? (
+              <Link href="/checkout?plan=yearly" className="btn btn-primary mt-5 w-fit">
+                {copy.action}
+              </Link>
+            ) : null}
+          </div>
         </div>
-        <div className="rounded-[18px] border border-[var(--line)] bg-white/70 p-4">
-          <Download className="text-[var(--green-deep)]" size={22} />
-          <h2 className="mt-3 text-lg font-extrabold">Open App Access</h2>
-          <p className="mt-2 text-xs leading-5 text-[var(--muted)]">Go to App Access to download Eatty AI.</p>
-          <button type="button" onClick={onGoAccess} className="btn btn-secondary mt-4 min-h-[44px] w-full text-sm">
+      </section>
+
+      <section className="flex flex-col gap-4 rounded-[20px] border border-[var(--line)] bg-white/76 p-4 shadow-[0_18px_60px_-52px_rgba(23,19,15,.55)] sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[#e4f0e7] text-[var(--green-deep)]">
+            <Download size={20} />
+          </span>
+          <div>
+            <h2 className="text-lg font-extrabold">Open App Access</h2>
+            <p className="mt-1 text-sm leading-6 text-[var(--muted)]">Go to App Access to download Eatty AI.</p>
+          </div>
+        </div>
+        <button type="button" onClick={onGoAccess} className="btn btn-secondary min-h-[44px] w-full shrink-0 text-sm sm:w-fit">
             Go to App Access
-          </button>
-        </div>
+        </button>
       </section>
     </div>
   );
@@ -482,8 +494,13 @@ function Access() {
   );
 }
 
-function Support() {
+function Support({ userEmail }: { userEmail: string }) {
   const [sent, setSent] = useState(false);
+  const [contactEmail, setContactEmail] = useState(userEmail);
+
+  useEffect(() => {
+    setContactEmail(userEmail);
+  }, [userEmail]);
 
   return (
     <section className="rounded-[24px] border border-[var(--line)] bg-white p-5 shadow-[0_22px_70px_-58px_rgba(23,19,15,.55)] md:p-6">
@@ -501,7 +518,8 @@ function Support() {
           Email
           <input
             className="mt-2 h-12 w-full rounded-2xl border border-[var(--line)] bg-[var(--paper)] px-4 outline-none focus:border-[var(--green)]"
-            defaultValue={account.email}
+            value={contactEmail}
+            onChange={(event) => setContactEmail(event.target.value)}
             type="email"
           />
         </label>
@@ -531,6 +549,7 @@ function Support() {
 export default function AccountDashboard() {
   const [active, setActive] = useState<SectionId>("overview");
   const [loginOpen, setLoginOpen] = useState(true);
+  const [userEmail, setUserEmail] = useState(account.email);
   const [actionModal, setActionModal] = useState<ActionModalData | null>(null);
   const [toast, setToast] = useState("");
   const ActiveIcon = useMemo(() => sections.find((item) => item.id === active)?.icon || Sparkles, [active]);
@@ -568,7 +587,7 @@ export default function AccountDashboard() {
             </span>
             <div>
               <p className="text-xs font-extrabold uppercase tracking-[.14em] text-[var(--faint)]">Dashboard</p>
-              <p className="break-all text-sm font-extrabold">{account.email}</p>
+              <p className="break-all text-sm font-extrabold">{userEmail}</p>
             </div>
           </div>
           <nav className="grid gap-1">
@@ -598,12 +617,19 @@ export default function AccountDashboard() {
           {active === "billing" ? <Billing onAction={setActionModal} /> : null}
           {active === "payment" ? <Payment onAction={setActionModal} /> : null}
           {active === "access" ? <Access /> : null}
-          {active === "support" ? <Support /> : null}
+          {active === "support" ? <Support userEmail={userEmail} /> : null}
           <SupportCard />
         </section>
       </div>
 
-      {loginOpen ? <LoginModal onClose={() => setLoginOpen(false)} /> : null}
+      {loginOpen ? (
+        <LoginModal
+          onLogin={(email) => {
+            setUserEmail(email);
+            setLoginOpen(false);
+          }}
+        />
+      ) : null}
       {actionModal ? <ActionModal data={actionModal} onClose={() => setActionModal(null)} onDone={showToast} /> : null}
       {toast ? (
         <div className="fixed bottom-5 left-1/2 z-50 w-[calc(100%-32px)] max-w-[420px] -translate-x-1/2 rounded-2xl border border-[var(--line)] bg-[#17130f] px-5 py-4 text-sm font-extrabold text-white shadow-[0_24px_80px_-36px_rgba(23,19,15,.8)]">
