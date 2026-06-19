@@ -175,7 +175,7 @@ function ActionModal({
 function LoginModal({ onClose }: { onClose: () => void }) {
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState(["", "", "", ""]);
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
   const codeRefs = useRef<Array<HTMLInputElement | null>>([]);
   const emailReady = /\S+@\S+\.\S+/.test(email);
   const codeReady = code.every(Boolean);
@@ -239,14 +239,14 @@ function LoginModal({ onClose }: { onClose: () => void }) {
             <p className="mx-auto mt-3 max-w-[300px] text-center text-xs font-medium leading-5 text-[var(--muted)]">
               We sent a login code to {email || "example@gmail.com"}. Check your inbox including Spam folder.
             </p>
-            <div className="mt-8 grid grid-cols-4 gap-3 px-8">
+            <div className="mt-8 grid grid-cols-6 gap-2 sm:gap-3">
               {code.map((value, index) => (
                 <input
                   key={index}
                   ref={(node) => {
                     codeRefs.current[index] = node;
                   }}
-                  className="h-14 rounded-[11px] border border-[#ececec] bg-white text-center text-xl font-extrabold shadow-[0_8px_24px_-18px_rgba(23,19,15,.55)] outline-none focus:border-[var(--green)]"
+                  className="h-13 min-w-0 rounded-[11px] border border-[#ececec] bg-white text-center text-xl font-extrabold shadow-[0_8px_24px_-18px_rgba(23,19,15,.55)] outline-none focus:border-[var(--green)] sm:h-14"
                   value={value}
                   onChange={(event) => {
                     const digit = event.target.value.replace(/\D/g, "").slice(-1);
